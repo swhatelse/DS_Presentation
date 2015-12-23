@@ -54,5 +54,45 @@
 #+LATEX_HEADER: \let\alert=\structure % to make sure the org * * works of tools
 #+BEAMER_FRAME_LEVEL: 2
 
-
 #+LATEX_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Topic}\tableofcontents[currentsection]\end{frame}}
+
+* Introduction
+** Paper
+  - Stanford University:
+    - Diego Ongaro 
+     - John Ousterhout
+   - USENIX ATC ’14
+** Another consensus algorithm
+*** Why Raft?
+- Paxos:
+  - Most of consenus implementations based on it
+  - But difficult to understand \to difficult to set up
+- Goal:
+  - Design *understandable* consensus algorithm
+*** Caracteristics
+    - Applied technics to improve understandability:
+      - Decomposition:
+        - Leader election
+        - Log replication
+        - Safety
+      - State space reduction:
+        - Reduce nonderterminism
+        - The way the server are consistents
+      - Use of novel features:
+        - Strong leader
+        - Leader election \to randomized timers
+        - Membership changes \to join consensus
+* Replicated state machines
+** Problem overview
+   #+BEGIN_LaTeX
+   \begin{figure}[tbh]
+   \centering
+   \vspace{-1.5mm}
+   \includegraphics[scale=0.2]{./img/fig1.jpg}
+   \end{figure}
+   #+END_LaTeX
+*** Properties
+    - Safety, never returning false result, non-Byzantine
+    - Failure resistance: 
+      - majority alive
+      - fail stop, recover and rejoin

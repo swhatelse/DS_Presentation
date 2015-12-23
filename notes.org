@@ -1,1 +1,81 @@
-* Introduction
+* DONE Introduction [2/2]
+*** DONE Why Raft?
+- Paxos:
+  - Most of consenus implementations based on it
+  - But difficult to understand \to difficult to set up
+- Goal:
+  - Design *understandable* consensus algorithm
+*** DONE Caracteristics
+     - Applied technics to improve understandability:
+       - Decomposition:
+         - Leader election
+         - Log replication
+         - Safety
+       - State space reduction:
+         - Reduce nonderterminism
+         - The way the server are consistents
+     - Use of novel features:
+       - Strong leader
+       - Leader election
+       - Membership changes
+* TODO Replicated state machines
+  - Implemented using replicated log
+  - Consistency of replicated log ensure by consensus algo
+  - General principle of consensus algo (like we saw in course):
+    - Receive request of client
+    - Aggreed with other server on the order
+    - Append it to its log
+    - Process the log (each process)
+    - Send result to client
+  # The two last points are missing
+* DONE The problem with Paxos
+  - Advantages:
+    - Capabilities
+      - reaching agreement on a single decision
+      - combination of instances \to facilitate series of decision (multi-Paxos) 
+      - Membership changes
+    - Ensure:
+      - safety
+      - liveness
+    - Has been proven
+  - Drawbacks:
+    - Very difficult to understand \to took one year understand completly, 
+      only few persons understand it 
+    - Due to its Single-decree fundation \to should be decomposed
+    - lack of details, different interpretation
+    - architecture of PaXos not suited for most practical systems
+    - Difficulties to implement \to real implemention different from Paxos
+      \to build on top unproven system.
+* DONE Designing for understandability
+  - Choices made around understandabilty
+  - Easier to understand the algo, develop intuitions
+	\to easier to extend to real-world implementations
+  - 2 technics:
+    - Problem decomposition
+      - election leader, log replication, safety, membership
+        changes \to independants
+    - Reduce state space
+      - eliminates nondeterminism where needed
+* TODO Raft [3/5]
+** TODO Leader election
+** DONE Log replication
+   - Clients send commands to the leader
+   - Entry commited when replicated in majority
+   - Leader check its logs are consistent with others:
+	 - send the previous index + term
+	 - look for the moment when start diverging \to remove
+	   all logs after this point and send its log after this point.
+	   - when not matching decrements nextIndex until it finds a
+		 matching log.
+** TODO Safety
+** DONE Follower and candidate crashes
+   - Leader keeps sending RPC until the candidature/follower recovers.
+   - RPC are idempotents.
+** DONE Timing and avaibility
+   - Import for the correctness of election mechanism.
+   - BroadcastTime << electionTimeout << MTBF (mean time before failure for a single node)
+	 - broadcastTime << electionTime \to leader can send reliably timeout
+	 - electionTime << MTBF \to the system can make progress without trigger unnecessary 
+       election.
+   - Only electionTimeout can be tuned and must be choosen according to BCtime and MTBF
+* TODO Cluster membership changes
