@@ -79,3 +79,38 @@
        election.
    - Only electionTimeout can be tuned and must be choosen according to BCtime and MTBF
 * TODO Cluster membership changes
+  - View change
+  - Possible to have two leaders elected in the same term \to splitted
+	majority.
+  - atomic switch of all the server impossible \to two-phase approach \to joint consensus
+  - when joining server may not have any logs:
+    - pre-join \to non-voting server \to can retrieve the log without interferring (impossibility
+	to commit log)
+  - leader removed (not anymore in the config)
+	- become follower after C_new committed
+  - Interferences of removed servers
+	- Will not receive heartbeat \to trigger election with new term
+	- Current leader \to follower
+	- removed server timeout and repeat again
+* TODO Implementation and evalution [2/3]
+** DONE Understandability
+   - Took student from Stanford University and U.C. Berkeley
+   - Video lecture on Paxos and Raft
+   - Quizzes \to Raft has better notes
+** TODO Correctness
+   - Cf. safety proof. 
+   - Relies on invariant that have not been checked.
+** DONE Perfomances
+   - Replication use minimal number of message 
+   - 2 concern 
+     - Time of convergence of the election
+	   What takes time is the split votes.
+	   To reduce chances of split vote \to use of randomness
+     - Down time
+	   function of the election timeout. The smaller it is the smaller the down time.
+	   But can not be to small \to unnecessary leader changes
+   - Remark:
+	 Number of process used is missing. Would be interesting to know if the election process 
+     is really scallable. With lots of nodes more likely to have splitted votes \to the 
+     process could repeat a during a log time. 
+     Maybe increase election timeout \to increase downtime.
