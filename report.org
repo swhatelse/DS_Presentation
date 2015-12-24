@@ -1,0 +1,46 @@
+#+TITLE: In Search of an Understandable Consensus Algorithm
+#+AUTHOR: Steven QUINITO MASNADA
+#+LaTeX_CLASS: article
+#+LaTeX_CLASS_OPTIONS: [margin=0.5in]
+#+OPTIONS: toc:nil
+
+* Introduction
+  Paxos is the most known consensus algorithm but it is very difficult to understand. Only few 
+  people master it. Moreover its architecture is not suited for most real systems. It results an
+  implementation that is different version of Paxos which has not been proved. The purpose of Raft
+  is be an alternative to (multi-)Paxos but easier to understand allowing to develop the intuition
+  more easily. This way people can more easily implement it and adapt it to their needs.
+* Raft
+** Design
+   The main goal of Raft is the understandability and all design choices have been made with that 
+   in mind. As opposed to Paxos, the problem has been splitted into different sub-problems that can
+   be understand independently. Raft follows the general principles of replicated state machines 
+   to ensure the consistency of the logs. The servers get requests from clients, agree on the 
+   order, append it to their logs, process the logs and return the result to the client. 
+
+   In Raft the servers can have three different states which are leader, candidate and follower.
+   All the requests are handled by one server (the leader) which replicates the logs among the 
+   others (the followers). Only one server take the decision of the order of the logs, this 
+   way it is easier to manage the consistency of the logs. The candidate state is used for the
+   election of leader. Time is divided in terms and each term start with an election and lasts 
+   until the next election. They are used as logical clock for the election and logs replication.
+** Leader election
+   Each follwer has a timeout that trigger a transitition to the candidate state. A candidate 
+   increment the term number and request votes from the others. To win an election a candidate 
+   musts gather the majority of the votes. Votes are granted on a first-come, first-served basis. 
+   A server can only vote one time per term and vote is granted only if the the candidate has at 
+   least a greater number of term. In order to avoid the likely of having many servers triggering 
+   an election at the same time and not having the majority, timeout are not statics, Raft use 
+   randomness. Even candidates have a timeout to trigger an other election in case of splitted 
+   votes. Once a candidate win an election it becomes leader and sends an heartbeat to establish 
+   its authority. As long as the leader is up it keeps sending an heartbeat frequently to reset the 
+   timeout of the followers.
+** Logs replication
+   Requests from clients are handled only by the leader. It appends the entry to its logs and then 
+   send it to all the followers.
+** Safety
+** Membership changes
+* Evaluation
+** Understandability
+** Perfomances
+* Conclusion
