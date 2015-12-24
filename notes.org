@@ -73,7 +73,7 @@
    - Candidate trigger an election 
      - Increment term 
 	 - Vote for him self
-     - send RPC Vote
+     - send RPC Vote, first come first serve
 	 - Win if majority votes.
 	 - other server send a vote, they reject the vote request if the term 
        number is less or if they alreadt have responded
