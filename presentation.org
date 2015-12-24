@@ -7,7 +7,7 @@
 
 #+Title: \textbf{In Search of an Understandable Consensus Algorithm}
 #+Author: Steven QUINITO MASNADA
-#+DATE: Grenoble,  December 18th 2015
+#+DATE: Grenoble,  January 8th 2016
 
 #+EPRESENT_FRAME_LEVEL: 2
 
@@ -81,9 +81,9 @@
       - Use of novel features:
         - Strong leader
         - Leader election \to randomized timers
-        - Membership changes \to join consensus
+        - Membership changes \to joint consensus
 * Replicated state machines
-** Problem overview
+** General design
    #+BEGIN_LaTeX
    \begin{figure}[tbh]
    \centering
@@ -96,3 +96,11 @@
     - Failure resistance: 
       - majority alive
       - fail stop, recover and rejoin
+* Raft
+** Design for understandility
+** Basics
+** Leader election
+** Logs replication
+** Safety
+** View change
+** Implementation and Evaluation 

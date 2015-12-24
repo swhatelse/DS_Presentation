@@ -56,8 +56,33 @@
         changes \to independants
     - Reduce state space
       - eliminates nondeterminism where needed
-* TODO Raft [3/5]
-** TODO Leader election
+* TODO Raft [5/6]
+** DONE Basics
+   - 3 states: 
+     - leader: handles requests 
+     - follower: responde to the leader 
+     - candidate: used to elect a new leader
+   - Time divided in terms.
+	 - Term starts with on election
+	 - Used as logical clock
+** DONE Leader election
+   - Leader send heartbeat to followers
+   - Followers have a timeout, if they don't receive an
+	 heartbeat from the leader before the timeout \to candidate
+	 state.
+   - Candidate trigger an election 
+     - Increment term 
+	 - Vote for him self
+     - send RPC Vote
+	 - Win if majority votes.
+	 - other server send a vote, they reject the vote request if the term 
+       number is less or if they alreadt have responded
+	 - Stay in candidate state until:
+	   - win the election
+		 - Send heartbeat to establish its authority
+	   - another win
+	     - received heartbeat from leader at least same term
+	   - timeout
 ** DONE Log replication
    - Clients send commands to the leader
    - Entry commited when replicated in majority
