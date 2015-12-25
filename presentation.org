@@ -82,8 +82,8 @@
         - Strong leader
         - Leader election \to randomized timers
         - Membership changes \to joint consensus
-* Replicated state machines
-** General design
+* Raft
+** Replicated state machines
    #+BEGIN_LaTeX
    \begin{figure}[tbh]
    \centering
@@ -96,7 +96,6 @@
     - Failure resistance: 
       - majority alive
       - fail stop, recover and rejoin
-* Raft
 ** Design for understandility
 ** Basics
 ** Leader election

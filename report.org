@@ -7,8 +7,8 @@
 * Introduction
   Paxos is the most known consensus algorithm but it is very difficult to understand. Only few 
   people master it. Moreover its architecture is not suited for most real systems. It results an
-  implementation that is different version of Paxos which has not been proved. The purpose of Raft
-  is be an alternative to (multi-)Paxos but easier to understand allowing to develop the intuition
+  implementation that is a different version of Paxos which has not been proved. The purpose of Raft
+  is to be an alternative to (multi-)Paxos but easier to understand allowing to develop the intuition
   more easily. This way people can more easily implement it and adapt it to their needs.
 * Raft
 ** Design
@@ -16,7 +16,8 @@
    in mind. As opposed to Paxos, the problem has been splitted into different sub-problems that can
    be understand independently. Raft follows the general principles of replicated state machines 
    to ensure the consistency of the logs. The servers get requests from clients, agree on the 
-   order, append it to their logs, process the logs and return the result to the client. 
+   order, append them to their logs, process the logs and return the result to the client. 
+   # Missing fail stop & non-bizantine
 
    In Raft the servers can have three different states which are leader, candidate and follower.
    All the requests are handled by one server (the leader) which replicates the logs among the 
@@ -26,21 +27,46 @@
    until the next election. They are used as logical clock for the election and logs replication.
 ** Leader election
    Each follwer has a timeout that trigger a transitition to the candidate state. A candidate 
-   increment the term number and request votes from the others. To win an election a candidate 
-   musts gather the majority of the votes. Votes are granted on a first-come, first-served basis. 
-   A server can only vote one time per term and vote is granted only if the the candidate has at 
-   least a greater number of term. In order to avoid the likely of having many servers triggering 
+   increments the term number and requests votes from the others. To win an election a candidate 
+   musts gather the majority of the votes. 
+   # Votes are granted on a first-come, first-served basis. 
+   A server can only vote one time per term and a vote is granted only if the the candidate has at 
+   least a greater number of term. In order to avoid the likelyhood of having many servers triggering 
    an election at the same time and not having the majority, timeout are not statics, Raft use 
-   randomness. Even candidates have a timeout to trigger an other election in case of splitted 
-   votes. Once a candidate win an election it becomes leader and sends an heartbeat to establish 
+   randomness. Even candidates have a timeout to trigger another election in case of splitted 
+   votes. Once a candidate wins an election it becomes leader and sends an heartbeat to establish 
    its authority. As long as the leader is up it keeps sending an heartbeat frequently to reset the 
    timeout of the followers.
+   # Talk about up-to-date server -> committed logs
 ** Logs replication
    Requests from clients are handled only by the leader. It appends the entry to its logs and then 
-   send it to all the followers.
+   send it to all the followers. When a log has been replicated on the majority it is committed
+   and processed by a state machine. The leader check its consistency with the followers using the
+   term number and the log index. For followers that are not consistents, it finds the moment when 
+   they started diverging, and overwrites their logs.
+   # All committed log must be the same on all the machine
+   # A server is update to if it the committed logs are the same as the others
+   # A server not up-to-date can not be leader.
 ** Safety
 ** Membership changes
+   # Maybe I missed the most fundamental part.
+   With the election mechanism on view change it is possible to have two leader elected at the same
+   at time as the switch between the view cannot happen at exactly the same time for all the servers.
+   Raft resolves this problem using the /joint consensus/ which a two-phase approach.
+   When a server join in, it may not have any logs, recovering can be long and it may prevent logs 
+   from being committed. To avoid this, raft allows the server to /pre-join/ as a non voting server.
+   
+   Another problem, is that removed servers will not received heartbeats and will trigger an election.
+   The other servers will see an election with a term number higher than their they will vote and the 
+   current leader will transition to follower state. This process can repeat indefinitively because,
+   removed server will never get any heartbeats.
+   # Solution missing
 * Evaluation
 ** Understandability
+   To measure the understandabilty if Raft, they took students from Stanford University and U.C. Berkeley,
+   teach them Paxos and Raft and make them pass a test. As a result, student had more success with questions
+   about Raft than Paxos. 
+   # some conclusion, interpretation
 ** Perfomances
+   The logs replication is efficient because it uses the minimum number of messages.
 * Conclusion

@@ -93,6 +93,12 @@
 	   - when not matching decrements nextIndex until it finds a
 		 matching log.
 ** TODO Safety
+*** Election restrictions
+*** Committing entries from previous terms
+	It is possible that an entry is replicated on the majority but not committed if the
+	leader crash before committing. Thus it may be possible to have previous terms with entry 
+	not committed. Next leader could try to commit it.
+	
 ** DONE Follower and candidate crashes
    - Leader keeps sending RPC until the candidature/follower recovers.
    - RPC are idempotents.
@@ -110,13 +116,15 @@
   - atomic switch of all the server impossible \to two-phase approach \to joint consensus
   - when joining server may not have any logs:
     - pre-join \to non-voting server \to can retrieve the log without interferring (impossibility
-	to commit log)
+	  to commit log)
+	  # Why the non-voting prevent to block commit?
   - leader removed (not anymore in the config)
 	- become follower after C_new committed
   - Interferences of removed servers
 	- Will not receive heartbeat \to trigger election with new term
 	- Current leader \to follower
 	- removed server timeout and repeat again
+	  # So what is the solution? 
 * TODO Implementation and evalution [2/3]
 ** DONE Understandability
    - Took student from Stanford University and U.C. Berkeley
