@@ -18,7 +18,7 @@
        - Strong leader
        - Leader election
        - Membership changes
-* TODO Replicated state machines
+* DONE Replicated state machines
   - Implemented using replicated log
   - Consistency of replicated log ensure by consensus algo
   - General principle of consensus algo (like we saw in course):
@@ -84,21 +84,33 @@
 	     - received heartbeat from leader at least same term
 	   - timeout
 ** DONE Log replication
+*** DONE Principle
    - Clients send commands to the leader
-   - Entry commited when replicated in majority
+   - Leader replicates log on the followers \to log commited when
+     replicated in majority 
+   - When committed \to apply it to all state machines
+   - Sends result to the client
+*** DONE Consistency check
    - Leader check its logs are consistent with others:
-	 - send the previous index + term
+	 - send the last index + term of its logs
 	 - look for the moment when start diverging \to remove
 	   all logs after this point and send its log after this point.
 	   - when not matching decrements nextIndex until it finds a
 		 matching log.
-** TODO Safety
-*** Election restrictions
-*** Committing entries from previous terms
-	It is possible that an entry is replicated on the majority but not committed if the
-	leader crash before committing. Thus it may be possible to have previous terms with entry 
-	not committed. Next leader could try to commit it.
-	
+    
+** TODO Safety [1/3]
+*** DONE Election restrictions
+    A leader stores all the committed logs of the previous term \to a
+    candidate can be elected only if it is up-to-date. That means it
+    must at least have the same logs than the majority and maybe more
+    but not less.
+*** TODO Committing entries from previous terms
+	It is possible that an entry is replicated on the majority but not
+	committed if the leader crashes before committing. Thus it may be
+	possible to have previous terms with entry not committed. Next
+	leader could try to commit it. 
+
+*** TODO Safety argument 
 ** DONE Follower and candidate crashes
    - Leader keeps sending RPC until the candidature/follower recovers.
    - RPC are idempotents.
@@ -125,12 +137,12 @@
 	- Current leader \to follower
 	- removed server timeout and repeat again
 	  # So what is the solution? 
-* TODO Implementation and evalution [2/3]
+* DONE Implementation and evalution [3/3]
 ** DONE Understandability
    - Took student from Stanford University and U.C. Berkeley
    - Video lecture on Paxos and Raft
    - Quizzes \to Raft has better notes
-** TODO Correctness
+** DONE Correctness
    - Cf. safety proof. 
    - Relies on invariant that have not been checked.
 ** DONE Perfomances
