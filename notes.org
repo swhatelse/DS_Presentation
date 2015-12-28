@@ -76,7 +76,7 @@
      - send RPC Vote, first come first serve
 	 - Win if majority votes.
 	 - other server send a vote, they reject the vote request if the term 
-       number is less or if they alreadt have responded
+       number is less or if they already have responded
 	 - Stay in candidate state until:
 	   - win the election
 		 - Send heartbeat to establish its authority
@@ -98,18 +98,23 @@
 	   - when not matching decrements nextIndex until it finds a
 		 matching log.
     
-** TODO Safety [1/3]
+** TODO Safety [2/3]
 *** DONE Election restrictions
     A leader stores all the committed logs of the previous term \to a
     candidate can be elected only if it is up-to-date. That means it
     must at least have the same logs than the majority and maybe more
     but not less.
-*** TODO Committing entries from previous terms
+    Raft compare index + term of the last log \to leader append
+    informations on its logs and voters vote for candidates that are
+    at least as up-to-date as them. 
+*** DONE Committing entries from previous terms
 	It is possible that an entry is replicated on the majority but not
 	committed if the leader crashes before committing. Thus it may be
 	possible to have previous terms with entry not committed. Next
 	leader could try to commit it. 
 
+    All not committed yet entries from previous terms are committed
+    when a log from the current term is committed. 
 *** TODO Safety argument 
 ** DONE Follower and candidate crashes
    - Leader keeps sending RPC until the candidature/follower recovers.
@@ -121,15 +126,36 @@
 	 - electionTime << MTBF \to the system can make progress without trigger unnecessary 
        election.
    - Only electionTimeout can be tuned and must be choosen according to BCtime and MTBF
-* TODO Cluster membership changes
+* DONE Cluster membership changes
   - View change
+** Principles
+   - Impossible to switch directly from C_new to C_old \to disjoint
+     majorities.
+     Raft use a transition phase : joint consensus.
+     In the joint consensus C_new and C_old can coexist (C_old,C_New) and
+     can still take request from client. In other approach it is
+     generally not the case (request are disable in the transition
+     phase).
+   - Functioning:
+     - The leader start the transition by saving its configuration \to
+       start the C_old,C_new configuration. It replicates it. 
+     - During this time C_old can still make decision freely because
+       the majority is still in C_old
+     - Once C_old,C_new as been committed, the majority is in
+       transition. So servers that are still in C_old and those are
+       already in C_new need the approval of C_old,C_new.
+     - Then the leader create the C_new configuration and replicates
+       it. Once C_new is committed C_old is irrevelant and C_old servers
+       can be shut down.
+** Problems that may happens
   - Possible to have two leaders elected in the same term \to splitted
-	majority.
-  - atomic switch of all the server impossible \to two-phase approach \to joint consensus
+    majority.
+  - atomic switch of all the server impossible \to two-phase approach \to
+    joint consensus 
   - when joining server may not have any logs:
-    - pre-join \to non-voting server \to can retrieve the log without interferring (impossibility
-	  to commit log)
-	  # Why the non-voting prevent to block commit?
+    - pre-join \to non-voting server \to can retrieve the log without
+      interferring (impossibility to commit log)
+      # Why the non-voting prevent to block commit?
   - leader removed (not anymore in the config)
 	- become follower after C_new committed
   - Interferences of removed servers
