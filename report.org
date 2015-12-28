@@ -57,11 +57,21 @@
    processed by a state machine. The leader check its consistency with
    the followers using the term number and the log index. For
    followers that are not consistents, it finds the moment when they
-   started diverging, and overwrites their logs. 
+   started diverging, and overwrites their logs. The leader cannot
+   overwrite its own logs and committed logs.
    # All committed log must be the same on all the machine
    # A server is update to if it the committed logs are the same as the others
-   # A server not up-to-date can not be leader.
+
 ** Safety
+   The leader election and logs replication mechanism are not enough
+   to ensure the integrity of the logs it must be coupled with other
+   restrictions.
+
+   First, a candadite cannot be elected if its logs are not at least as
+   up-to-date as the majority.
+
+   Second, the leader completeness ensure that a log entry committed in a
+   given term will be present in the log of leaders of higher terms.
 ** Membership changes
    # Maybe I missed the most fundamental part.
    With the election mechanism on view change it is possible to have
