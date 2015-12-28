@@ -73,7 +73,17 @@
    Second, the leader completeness ensure that a log entry committed in a
    given term will be present in the log of leaders of higher terms.
 ** Membership changes
+   Raft uses a transition phase to switch from an old (C_old)
+   configuration to a new one (C_new) because it is not safe to switch
+   directly go from C_old to C_new. It is called the the joint
+   consensus. In the transition phase (C_old,C_new), C_old and C_new
+   coexist and can make decisions about election and log
+   commitment. In general it is not the case in other change
+   configuration mechanism, in fact, in the transition phase, no
+   request are handled, decisions are suspended. 
+
    # Maybe I missed the most fundamental part.
+   # Yeah this part can be ommitted
    With the election mechanism on view change it is possible to have
    two leader elected at the same at time as the switch between the
    view cannot happen at exactly the same time for all the
