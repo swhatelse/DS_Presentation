@@ -103,11 +103,39 @@
 * Evaluation
 ** Understandability
    To measure the understandabilty if Raft, they took students from
-   Stanford University and U.C. Berkeley, teach them Paxos and Raft
-   and make them pass a test. As a result, student had more success
-   with questions about Raft than Paxos. 
+   Stanford University and U.C. Berkeley, taught them Paxos and Raft
+   and made them pass a test. As expected, students had more success
+   with questions about Raft than Paxos. This means they successfully
+   achieved the goal of making a more understandable consensus
+   algorithm.
    # some conclusion, interpretation
 ** Perfomances
-   The logs replication is efficient because it uses the minimum
-   number of messages.
+   Regarding the perfomances, there are three important points. First
+   one is the logs replication, it is assumed efficient because it
+   uses the minimum number of messages.
+
+   The second point is the for the election to converge. In the best
+   case, it takes the time for a process to timeout, the time to send
+   the vote request to all the servers and the time to receive
+   acknowledgment from the majority. But the election could take more
+   time if splitted votes occur. To avoid the likelyhood of this
+   scenario Raft uses randomness for the timeout.
+
+   The third point is the down time of the system. During time between
+   which a leader crashes and a new on is elected the system cannot
+   take request from clients. Thus the down time dependent on the
+   duration of the election timeout. The shorter it is the more
+   available the system is. But a too small timeout will trigger
+   unnecessary election.  
 * Conclusion
+  As can be seen with Raft, they succeed in making a more
+  understandable consensus algorithm than Paxos. People can more
+  easily have the intuition and more easily implement real systems on
+  top of it. But does it scale well? They did not mention how many
+  servers they used for their tests. We saw that randomness for the
+  timeout election reduces the probability of split votes and allows
+  the election to converge. But if there are lots of servers the
+  probability of split votes will be high so we need to use bigger 
+  timeouts. Hence it will increase the down time. With lots of nodes
+  does the down time still acceptable?
+
