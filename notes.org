@@ -178,10 +178,12 @@
 	   What takes time is the split votes.
 	   To reduce chances of split vote \to use of randomness
      - Down time
-	   function of the election timeout. The smaller it is the smaller the down time.
-	   But can not be to small \to unnecessary leader changes
+       function of the election timeout. The smaller it is the
+       smaller the down time. 
+       But can not be to small \to unnecessary leader changes
    - Remark:
-	 Number of process used is missing. Would be interesting to know if the election process 
-     is really scallable. With lots of nodes more likely to have splitted votes \to the 
-     process could repeat a during a log time. 
+     Number of process used is missing. Would be interesting to know
+     if the election process is really scallable. With lots of nodes
+     more likely to have splitted votes \to the process could repeat a
+     during a log time.  
      Maybe increase election timeout \to increase downtime.
